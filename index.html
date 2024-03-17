@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Rastreador de Criptomoedas</title>
+<style>
+  body { font-family: Arial, sans-serif; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+  th { background-color: #4CAF50; color: white; }
+  .baixa { background-color: #f8d7da; }
+  .alta { background-color: #d4edda; }
+.botao-compra {
+    background-color: #4CAF50; /* Cor de fundo verde */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+</style>
+</head>
+<body>
+
+<h1>Rastreador de Criptomoedas Binance</h1>
+<h3>É apenas para análise. Todas criptomoedas são de alto risco.</h3>
+<a href="https://link.mercadopago.com.br/criptomoedasbinance" class="botao-compra">Doações</a>
+
+<script type="text/javascript" src="https://files.coinmarketcap.com/static/widget/coinMarquee.js"></script><div id="coinmarketcap-widget-marquee" coins="1,1027,825,1839,5994,1958,23095,1831,16086,4206,74,29870,10804,2,52,2010,24275,5426,5805,7083,21846,20396,26025,10407,4066,6636,3890,1975" currency="USD" theme="light" transparent="false" show-symbol-logo="true"></div>
+
+<table id="cryptoTable">
+  <thead>
+    <tr>
+      <th>Criptomoeda</th>
+      <th>Preço (USDT)</th>
+      <th>Variação (24h)</th>
+      <th>Ação</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Os dados das criptomoedas serão inseridos aqui -->
+  </tbody>
+</table>
+
+<script>
+function fetchCryptoData() {
+  fetch('https://api.binance.com/api/v3/ticker/24hr')
+    .then(response => response.json())
+    .then(data => {
+      const filteredData = data.filter(pair => pair.symbol.endsWith('USDT'));
+      displayCryptoData(filteredData);
+    })
+    .catch(error => console.error('Erro ao buscar dados:', error));
+}
+
+function displayCryptoData(data) {
+  const tableBody = document.getElementById('cryptoTable').getElementsByTagName('tbody')[0];
+  tableBody.innerHTML = ''; // Limpa a tabela antes de inserir novos dados
+  data.forEach(coin => {
+    const row = document.createElement('tr');
+    const priceChangePercent = parseFloat(coin.priceChangePercent);
+    let action = '';
+    let rowClass = '';
+
+    if (priceChangePercent <= -5) {
+      action = 'Comprar';
+      rowClass = 'baixa';
+    } else if (priceChangePercent >= 1) {
+      action = 'Vender';
+      rowClass = 'alta';
+    }
+
+    row.innerHTML = `
+      <td>${coin.symbol}</td>
+      <td>${parseFloat(coin.lastPrice).toFixed(2)} USDT</td>
+      <td>${priceChangePercent.toFixed(2)}%</td>
+      <td class="${rowClass}">${action}</td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+// Atualiza os dados a cada minuto
+setInterval(fetchCryptoData, 5000);
+
+// Inicia o rastreamento quando a página é carregada
+document.addEventListener('DOMContentLoaded', fetchCryptoData);
+</script>
+
+</body>
+</html>
